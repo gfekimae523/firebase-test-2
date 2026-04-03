@@ -25,6 +25,7 @@ onAuthStateChanged(auth, async (user) => {
         // ログイン確認後、データ取得
         fetchTimesheetRequests();
         fetchChangeRequests();
+        renderCalendar(currentYear, currentMonth);
     } catch (error) {
         console.error("データ取得エラー:", error);
     }
@@ -124,9 +125,9 @@ async function fetchChangeRequests() {
 // ==========================================
 // モーダル・申請送信
 // ==========================================
-// 開閉処理
 const tsModal = document.getElementById('timesheet-modal');
 const chModal = document.getElementById('change-modal');
+let selectedTimesheetDates = new Set(); // 選択された日付のセット
 
 document.getElementById('open-timesheet-modal')?.addEventListener('click', () => tsModal.classList.remove('hidden'));
 document.getElementById('open-change-modal')?.addEventListener('click', () => chModal.classList.remove('hidden'));
@@ -134,24 +135,121 @@ document.querySelectorAll('.close-modal').forEach(btn => {
     btn.addEventListener('click', (e) => document.getElementById(e.target.getAttribute('data-target')).classList.add('hidden'));
 });
 
+// モーダル用カレンダー描画
+const tsMonthInput = document.getElementById('timesheet-month');
+const modalCalGrid = document.getElementById('modal-calendar-grid');
+
+function renderModalCalendar(year, month) {
+    if (!modalCalGrid) return;
+    modalCalGrid.innerHTML = '';
+    selectedTimesheetDates.clear();
+
+    ['日', '月', '火', '水', '木', '金', '土'].forEach(d => {
+        const el = document.createElement('div');
+        el.textContent = d;
+        el.style.textAlign = 'center';
+        el.style.fontSize = '11px';
+        el.style.color = '#6B7280';
+        modalCalGrid.appendChild(el);
+    });
+
+    const firstDay = new Date(year, month - 1, 1).getDay();
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+        modalCalGrid.appendChild(document.createElement('div'));
+    }
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const el = document.createElement('div');
+        el.className = 'modal-cal-cell';
+        el.dataset.day = i;
+        el.style.padding = '8px';
+        el.style.border = '1px solid #E5E7EB';
+        el.style.borderRadius = '6px';
+        el.style.textAlign = 'center';
+        el.style.cursor = 'pointer';
+        el.style.fontSize = '14px';
+        el.style.transition = 'all 0.2s';
+        el.innerHTML = i;
+        
+        el.addEventListener('click', () => {
+            if (selectedTimesheetDates.has(i)) {
+                selectedTimesheetDates.delete(i);
+                el.style.backgroundColor = 'white';
+                el.style.color = 'var(--text-main)';
+                el.style.borderColor = '#E5E7EB';
+            } else {
+                selectedTimesheetDates.add(i);
+                el.style.backgroundColor = 'var(--primary-color)';
+                el.style.color = 'white';
+                el.style.borderColor = 'var(--primary-color)';
+            }
+        });
+        modalCalGrid.appendChild(el);
+    }
+}
+
+tsMonthInput?.addEventListener('change', (e) => {
+    const val = e.target.value;
+    if (!val) return;
+    const [y, m] = val.split('-');
+    renderModalCalendar(parseInt(y), parseInt(m));
+});
+
+document.getElementById('fill-weekdays-btn')?.addEventListener('click', () => {
+    const val = tsMonthInput.value;
+    if (!val) return alert('先に対象月を選択してください。');
+    const [y, m] = val.split('-');
+    const daysInMonth = new Date(parseInt(y), parseInt(m), 0).getDate();
+    
+    document.querySelectorAll('.modal-cal-cell').forEach(el => {
+        const i = parseInt(el.dataset.day);
+        const dayOfWeek = new Date(parseInt(y), parseInt(m) - 1, i).getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+            selectedTimesheetDates.add(i);
+            el.style.backgroundColor = 'var(--primary-color)';
+            el.style.color = 'white';
+            el.style.borderColor = 'var(--primary-color)';
+        } else {
+            selectedTimesheetDates.delete(i);
+            el.style.backgroundColor = 'white';
+            el.style.color = 'var(--text-main)';
+            el.style.borderColor = '#E5E7EB';
+        }
+    });
+});
+
 // タイムシート送信
 document.getElementById('submit-timesheet')?.addEventListener('click', async () => {
-    const month = document.getElementById('timesheet-month').value; // "YYYY-MM"
+    const month = tsMonthInput.value; 
     if (!month) return alert('対象月を選択してください。');
+    if (selectedTimesheetDates.size === 0) return alert('通所予定日を少なくとも1日以上選択してください。');
 
     const btn = document.getElementById('submit-timesheet');
     btn.disabled = true;
     btn.textContent = "送信中...";
 
     try {
+        const datesArr = Array.from(selectedTimesheetDates).sort((a,b)=>a-b);
+        const attendances = datesArr.map(d => ({
+            date: `${month}-${String(d).padStart(2, '0')}`,
+            startTime: "10:00",
+            endTime: "15:00"
+        }));
+
         await addDoc(collection(db, 'timesheetRequests'), {
             uid: currentUser.uid,
             yearMonth: month,
             status: "pending",
+            attendances: attendances,
             createdAt: new Date().toISOString()
         });
         alert('タイムシートの申請を送信しました！');
         tsModal.classList.add('hidden');
+        selectedTimesheetDates.clear();
+        tsMonthInput.value = '';
+        if(modalCalGrid) modalCalGrid.innerHTML = '<p class="empty-state" style="grid-column: span 7;">対象月を選択してください。</p>';
         fetchTimesheetRequests();
     } catch (error) {
         console.error(error);
@@ -198,15 +296,25 @@ document.getElementById('submit-change')?.addEventListener('click', async () => 
 });
 
 // ==========================================
-// カレンダー（モックのまま置いておく）
+// カレンダー機能
 // ==========================================
-const calendarGrid = document.getElementById('calendar-grid');
-if (calendarGrid) {
+const now = new Date();
+let currentYear = now.getFullYear();
+let currentMonth = now.getMonth() + 1;
+
+async function renderCalendar(year, month) {
+    const calendarGrid = document.getElementById('calendar-grid');
+    const monthDisplay = document.getElementById('current-month-display');
+    if (!calendarGrid || !monthDisplay) return;
+
     calendarGrid.style.display = 'grid';
     calendarGrid.style.gridTemplateColumns = 'repeat(7, 1fr)';
     calendarGrid.style.gap = '8px';
+    
+    monthDisplay.textContent = `${year}年${month}月`;
     calendarGrid.innerHTML = '';
     
+    // ヘッダー行
     ['日', '月', '火', '水', '木', '金', '土'].forEach(d => {
         const el = document.createElement('div');
         el.textContent = d;
@@ -217,7 +325,20 @@ if (calendarGrid) {
         calendarGrid.appendChild(el);
     });
 
-    for (let i = 1; i <= 30; i++) {
+    const firstDay = new Date(year, month - 1, 1).getDay();
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    // 月初めの空白セル
+    for (let i = 0; i < firstDay; i++) {
+        calendarGrid.appendChild(document.createElement('div'));
+    }
+
+    // Firestoreから当月の承認済みタイムシートデータを取得する想定の処理
+    // ※今回はベースとして曜日判定で仮データを出しますが、本来はここに取得した予定をマッピングします
+    const yearMonthStr = `${year}-${String(month).padStart(2, '0')}`;
+
+    // 日付セル描画
+    for (let i = 1; i <= daysInMonth; i++) {
         const el = document.createElement('div');
         el.style.padding = '12px';
         el.style.border = '1px solid #E5E7EB';
@@ -226,10 +347,23 @@ if (calendarGrid) {
         el.style.backgroundColor = 'white';
         el.innerHTML = `<span style="font-weight: 500">${i}</span>`;
         
-        const dayOfWeek = (i % 7);
-        if (dayOfWeek !== 1 && dayOfWeek !== 0) {
+        // 平日のモック予定（将来用プレースホルダー）
+        const dayOfWeek = new Date(year, month - 1, i).getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
             el.innerHTML += `<div style="margin-top: 8px; font-size: 11px; background: #EEF2FF; color: #4F46E5; padding: 4px; border-radius: 4px;">通所予定<br>10:00-15:00</div>`;
         }
+        
         calendarGrid.appendChild(el);
     }
 }
+
+document.getElementById('prev-month')?.addEventListener('click', () => {
+    currentMonth--;
+    if(currentMonth < 1) { currentMonth = 12; currentYear--; }
+    renderCalendar(currentYear, currentMonth);
+});
+document.getElementById('next-month')?.addEventListener('click', () => {
+    currentMonth++;
+    if(currentMonth > 12) { currentMonth = 1; currentYear++; }
+    renderCalendar(currentYear, currentMonth);
+});

@@ -77,15 +77,21 @@
             <h3>タイムシートの作成・申請</h3>
             <div class="modal-body">
                 <p style="margin-bottom: 12px; color: var(--text-muted); font-size: 14px;">月単位の通所予定を入力してください。</p>
-                <!-- 簡易フォーム例 -->
-                <div style="margin-bottom: 16px;">
-                    <label>対象月</label>
-                    <input type="month" id="timesheet-month" class="form-control">
+                
+                <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div style="flex:1;">
+                        <label>対象月</label>
+                        <input type="month" id="timesheet-month" class="form-control">
+                    </div>
+                    <button id="fill-weekdays-btn" class="btn btn-outline btn-sm" style="margin-left: 12px; height: 40px;">平日を一括選択</button>
                 </div>
-                <!-- 本来はここにカレンダーGUIが入る想定 -->
-                <div style="padding: 16px; background: #f9fafb; margin-bottom: 16px; border-radius: 8px;">
-                    デフォルト時間 (10:00 〜 15:00) で月間データを生成します。
+
+                <!-- インタラクティブカレンダーGUI -->
+                <div id="modal-calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 16px;">
+                     <p class="empty-state" style="grid-column: span 7;">対象月を選択してください。</p>
                 </div>
+                
+                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">※選択された日は 10:00 〜 15:00 で申請されます。日付をクリックして切り替えてください。</div>
             </div>
             <div class="modal-actions">
                 <button class="btn btn-outline close-modal" data-target="timesheet-modal">キャンセル</button>
