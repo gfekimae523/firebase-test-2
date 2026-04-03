@@ -9,79 +9,72 @@
 </head>
 <body class="dashboard-body">
     <!-- サイドバー -->
-    <aside class="sidebar">
+    <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
             <div class="logo">🌟 Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item">ダッシュボード</a>
-            <a href="attendance.html" class="nav-item">通所・タイムシート</a>
-            <a href="interview.html" class="nav-item active">面談</a>
+            <a href="attendance.html" id="nav-attendance" class="nav-item">通所・タイムシート</a>
+            <a href="interview.html" id="nav-interview" class="nav-item active">面談</a>
         </nav>
     </aside>
 
     <!-- メインコンテンツ -->
     <main class="main-content">
+        <!-- ヘッダー -->
         <header class="top-header">
             <h2 class="page-title">面談</h2>
             <div class="user-profile">
-                <span id="user-name" class="user-name">読み込み中...</span>
+                <span id="username" class="user-name">読み込み中...</span>
                 <button id="logout-btn" class="btn btn-outline btn-sm">ログアウト</button>
             </div>
         </header>
 
+        <!-- コンテンツエリア -->
         <div class="content-wrapper">
-            <div class="header-actions" style="display: flex; justify-content: flex-end; margin-bottom: 24px;">
-                <button id="open-interview-modal" class="btn btn-primary" style="background-color: var(--primary-color); color: white;">+ 面談を申請する</button>
-            </div>
+            <section id="interview-schedule" class="dashboard-section card glass-card">
+                <h3>📅 確定した面談予定</h3>
+                <ul id="confirmed-interviews" class="notification-list">
+                    <!-- JSで動的に表示 -->
+                </ul>
+                
+                <h3 style="margin-top: 24px;">⏳ 申請中の面談</h3>
+                <ul id="pending-interviews" class="notification-list">
+                    <!-- JSで動的に表示 -->
+                </ul>
+            </section>
 
-            <div class="dashboard-grid">
-                <!-- 確定済みの面談 -->
-                <section class="dashboard-section card glass-card">
-                    <h3>💬 確定した面談予定</h3>
-                    <ul id="scheduled-interviews" class="notification-list">
-                        <li>
-                            <div style="font-weight: 500; color: var(--primary-color);">4月10日(水) 13:00 - 14:00</div>
-                            <div style="font-size: 13px; color: var(--text-muted);">担当: 山田スタッフ / 相談内容: 応募書類の書き方について</div>
-                        </li>
-                    </ul>
-                </section>
-
-                <!-- 申請中の面談 -->
-                <section class="dashboard-section card glass-card">
-                    <h3>⏳ 申請中の面談</h3>
-                    <ul id="pending-interviews" class="notification-list">
-                        <li>
-                            <div style="font-weight: 500;">第3週（4月15日〜）希望</div>
-                            <div style="font-size: 13px; color: var(--text-muted);">現在管理者による調整中です。</div>
-                        </li>
-                    </ul>
-                </section>
-            </div>
+            <section id="interview-actions" style="margin-top: 24px;">
+                <button id="create-interview-request" class="btn btn-primary">面談を申請する</button>
+            </section>
         </div>
     </main>
 
-    <!-- モーダル: 面談申請 -->
-    <div id="interview-modal" class="modal-overlay hidden">
+    <!-- モーダル: 面談申請作成 -->
+    <div id="interview-request-modal" class="modal-overlay hidden">
         <div class="modal-card">
-            <h3>面談の申請</h3>
+            <h3>面談申請作成</h3>
             <div class="modal-body">
-                <div style="margin-bottom: 16px;">
-                    <label>対象週の開始日（月曜日）</label>
-                    <input type="date" id="interview-week" class="form-control">
+                <div class="form-group">
+                    <label for="target-week">対象週選択（月曜日の日付）</label>
+                    <input type="date" id="target-week" class="form-control">
                 </div>
-                <div style="margin-bottom: 16px;">
-                    <label>面談希望日時（複数可）</label>
-                    <textarea id="interview-dates" class="form-control" rows="3" placeholder="例: 月曜の午後、水曜の午前中いつでも可"></textarea>
+                <div class="form-group">
+                    <label>空き状況・希望日時</label>
+                    <div id="available-date-picker" class="checkbox-grid" style="margin-bottom: 8px;">
+                        <!-- JSまたはHTMLで曜日ごとの選択肢を表示 -->
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">希望する曜日や時間帯を下の詳細欄に記入してください。</p>
+                    </div>
                 </div>
-                <div style="margin-bottom: 16px;">
-                    <label>相談したい内容</label>
-                    <textarea id="interview-content" class="form-control" rows="3" placeholder="相談内容を入力してください"></textarea>
+                <div class="form-group">
+                    <label for="interview-content">面談内容・希望事項</label>
+                    <textarea id="interview-content" class="form-control" rows="4" placeholder="相談したい内容や具体的な希望日時を入力してください。"></textarea>
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-outline close-modal" data-target="interview-modal">キャンセル</button>
-                <button id="submit-interview" class="btn btn-primary" style="background-color: var(--primary-color); color: white;">申請送信</button>
+                <button id="cancel-interview-request" class="btn btn-outline">キャンセル</button>
+                <button id="submit-interview-request" class="btn btn-primary">申請送信</button>
             </div>
         </div>
     </div>

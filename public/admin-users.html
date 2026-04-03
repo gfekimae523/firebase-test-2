@@ -6,78 +6,103 @@
     <title>ユーザー管理 - 就労移行支援ポータル</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-        .data-table th, .data-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #E5E7EB; }
-        .data-table th { background-color: #F9FAFB; color: var(--text-muted); font-weight: 500; font-size: 13px; }
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
-        .badge-user { background: #EEF2FF; color: var(--primary-color); }
-        .badge-admin { background: #FEF2F2; color: #EF4444; }
-    </style>
 </head>
 <body class="dashboard-body">
     <!-- サイドバー -->
-    <aside class="sidebar">
+    <aside id="sidebar" class="sidebar">
         <div class="sidebar-header" style="background-color: #1F2937;">
             <div class="logo" style="color: white;">🌟 Admin Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="admin-dashboard.html" class="nav-item">ダッシュボード</a>
-            <a href="admin-users.html" class="nav-item active">ユーザー管理</a>
-            <a href="admin-attendance.html" class="nav-item">通所予定管理</a>
-            <a href="admin-interview.html" class="nav-item">面談管理</a>
+            <a href="admin-users.html" id="nav-admin-users" class="nav-item active">ユーザー管理</a>
+            <a href="admin-attendance.html" id="nav-admin-attendance" class="nav-item">
+                通所予定管理
+                <span id="badge-attendance" class="badge badge-danger hidden">0</span>
+            </a>
+            <a href="admin-interview.html" id="nav-admin-interview" class="nav-item">
+                面談管理
+                <span id="badge-interview" class="badge badge-danger hidden">0</span>
+            </a>
         </nav>
     </aside>
 
+    <!-- メインコンテンツ -->
     <main class="main-content">
-        <header class="top-header" style="border-bottom-color: var(--primary-color);">
+        <!-- ヘッダー -->
+        <header class="top-header">
             <h2 class="page-title">ユーザー管理</h2>
             <div class="user-profile">
-                <span id="user-name" class="user-name">管理者 読み込み中...</span>
+                <span id="admin-name" class="user-name">読み込み中...</span>
                 <button id="logout-btn" class="btn btn-outline btn-sm">ログアウト</button>
             </div>
         </header>
 
         <div class="content-wrapper">
             <section class="dashboard-section card glass-card">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-                    <h3>👥 登録ユーザー一覧</h3>
-                    <input type="text" class="form-control" placeholder="名前やメールで検索..." style="width: 250px;">
+                <!-- フィルターエリア -->
+                <div id="filter-area" style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <input type="text" id="search-user" class="form-control" placeholder="名前・メールで検索..." style="flex: 1; min-width: 200px;">
+                    <select id="role-filter" class="form-control" style="width: 150px;">
+                        <option value="all">全ロール</option>
+                        <option value="user">利用者</option>
+                        <option value="admin">管理者</option>
+                    </select>
+                    <select id="status-filter" class="form-control" style="width: 150px;">
+                        <option value="all">全ステータス</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
                 </div>
                 
-                <table class="data-table">
+                <table id="users-table" class="data-table">
                     <thead>
                         <tr>
                             <th>名前</th>
                             <th>メールアドレス</th>
-                            <th>権限</th>
+                            <th>ロール</th>
                             <th>ステータス</th>
-                            <th>アクション</th>
+                            <th>登録日</th>
+                            <th>操作</th>
                         </tr>
                     </thead>
                     <tbody id="users-tbody">
-                        <!-- ダミーデータ -->
-                        <tr>
-                            <td style="font-weight: 500;">山田 太郎</td>
-                            <td style="color: var(--text-muted);">yamada@example.com</td>
-                            <td><span class="badge badge-user">User</span></td>
-                            <td>Active</td>
-                            <td><button class="btn btn-outline btn-sm">詳細</button></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 500;">管理者 次郎</td>
-                            <td style="color: var(--text-muted);">admin@example.com</td>
-                            <td><span class="badge badge-admin">Admin</span></td>
-                            <td>Active</td>
-                            <td><button class="btn btn-outline btn-sm">詳細</button></td>
-                        </tr>
+                        <!-- JSで動的に表示 -->
                     </tbody>
                 </table>
             </section>
         </div>
     </main>
 
+    <!-- モーダル：ユーザー編集 -->
+    <div id="user-edit-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>ユーザー編集</h3>
+            <div class="modal-body">
+                <p>ユーザー名: <span id="edit-username" style="font-weight: 600;">-</span></p>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="edit-role">ロール選択</label>
+                    <select id="edit-role" class="form-control">
+                        <option value="user">user (利用者)</option>
+                        <option value="admin">admin (管理者)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-status">ステータス</label>
+                    <select id="edit-status" class="form-control">
+                        <option value="active">active (活動中)</option>
+                        <option value="inactive">inactive (退所/停止)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-user-edit" class="btn btn-outline">キャンセル</button>
+                <button id="save-user-btn" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="js/firebase-config.js"></script>
-    <script type="module" src="js/admin-dashboard.js"></script>
+    <script type="module" src="js/admin-users.js"></script>
 </body>
 </html>

@@ -1,59 +1,78 @@
-import { auth, provider, signInWithPopup, onAuthStateChanged, db, doc, getDoc, setDoc } from './firebase-config.js';
+import { auth, provider, signInWithPopup, onAuthStateChanged, db, doc, getDoc, setDoc, serverTimestamp } from './firebase-config.js';
 
-const loginBtn = document.getElementById('google-login-btn');
-const errorText = document.getElementById('login-error');
+const googleLoginBtn = document.getElementById('google-login-btn');
+const errorMessage = document.getElementById('error-message');
 
-if (loginBtn) {
-    loginBtn.addEventListener('click', async () => {
-        try {
-            errorText.classList.add('hidden');
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            
-            // Firestoreでユーザー権限を確認・作成
+/**
+ * ページ初期化、認証状態チェック
+ */
+function initLoginPage() {
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', handleGoogleLogin);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        // index.html または ルート にいる場合のみリダイレクトを確認
+        if (user && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/')) {
             const userRef = doc(db, 'users', user.uid);
             const userSnap = await getDoc(userRef);
-            
-            if (!userSnap.exists()) {
-                // 初回ログイン時のユーザー登録（デフォルトは一般ユーザー）
-                await setDoc(userRef, {
-                    email: user.email,
-                    username: user.displayName || '名無し',
-                    role: 'user', // admin権限を付与する場合はFirestore上で手動で書き換える想定
-                    status: 'active',
-                    createdAt: new Date().toISOString()
-                });
-                window.location.href = 'dashboard.html';
-            } else {
-                // 既存ユーザーの権限による振り分け
+            if (userSnap.exists()) {
                 const userData = userSnap.data();
-                if (userData.role === 'admin') {
-                    window.location.href = 'admin-dashboard.html';
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
+                redirectAfterLogin(userData.role);
             }
-        } catch (error) {
-            console.error("ログインエラー:", error);
-            errorText.textContent = "ログインに失敗しました。もう一度お試しください。";
-            errorText.classList.remove('hidden');
         }
     });
 }
 
-// すでにログイン済みの場合は自動リダイレクトする処理
-onAuthStateChanged(auth, async (user) => {
-    // index.htmlにいる場合のみリダイレクトを実行
-    if (user && window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+/**
+ * Googleログイン実行
+ */
+async function handleGoogleLogin() {
+    try {
+        if (errorMessage) errorMessage.classList.add('hidden');
+        
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        
         const userRef = doc(db, 'users', user.uid);
         const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
+        
+        if (!userSnap.exists()) {
+            // 初回ログイン時のユーザー登録
+            await setDoc(userRef, {
+                email: user.email,
+                username: user.displayName || '名無し',
+                role: 'user', 
+                status: 'active',
+                createdAt: serverTimestamp()
+            });
+            redirectAfterLogin('user');
+        } else {
+            // 既存ユーザー
             const userData = userSnap.data();
-            if (userData.role === 'admin') {
-                window.location.href = 'admin-dashboard.html';
-            } else {
-                window.location.href = 'dashboard.html';
-            }
+            redirectAfterLogin(userData.role);
+        }
+    } catch (error) {
+        console.error("ログインエラー:", error);
+        if (errorMessage) {
+            errorMessage.textContent = "ログインに失敗しました。もう一度お試しください。";
+            errorMessage.classList.remove('hidden');
         }
     }
-});
+}
+
+/**
+ * ロール別リダイレクト処理
+ * @param {string} role ユーザーの権限
+ */
+function redirectAfterLogin(role) {
+    if (role === 'admin') {
+        window.location.href = 'admin-dashboard.html';
+    } else {
+        window.location.href = 'dashboard.html';
+    }
+}
+
+// 実行
+initLoginPage();
+

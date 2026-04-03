@@ -9,14 +9,14 @@
 </head>
 <body class="dashboard-body">
     <!-- サイドバー -->
-    <aside class="sidebar">
+    <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
             <div class="logo">🌟 Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item active">ダッシュボード</a>
-            <a href="attendance.html" class="nav-item">通所・タイムシート</a>
-            <a href="interview.html" class="nav-item">面談</a>
+            <a href="attendance.html" id="nav-attendance" class="nav-item">通所・タイムシート</a>
+            <a href="interview.html" id="nav-interview" class="nav-item">面談</a>
         </nav>
     </aside>
 
@@ -26,36 +26,35 @@
         <header class="top-header">
             <h2 class="page-title">ダッシュボード</h2>
             <div class="user-profile">
-                <span id="user-name" class="user-name">読み込み中...</span>
+                <span id="username" class="user-name">読み込み中...</span>
                 <button id="logout-btn" class="btn btn-outline btn-sm">ログアウト</button>
             </div>
         </header>
 
         <!-- コンテンツエリア -->
         <div class="content-wrapper">
-            <!-- 全体お知らせ -->
-            <section class="dashboard-section card glass-card">
-                <h3>📢 全体お知らせ</h3>
-                <ul class="notification-list" id="global-notices">
-                    <li><span class="date">2026/04/01</span> 新しいポータルサイトがオープンしました！</li>
-                    <li><span class="date">2026/04/03</span> 今月のタイムシート入力は5日までにお願いします。</li>
+            <!-- お知らせ一覧 -->
+            <section id="announcements" class="dashboard-section card glass-card">
+                <h3>📢 お知らせ</h3>
+                <ul class="notification-list" id="announcement-list">
+                    <!-- JSで動的に追加 -->
                 </ul>
             </section>
 
             <div class="dashboard-grid">
                 <!-- 回答期限の近い申請 -->
-                <section class="dashboard-section card glass-card">
-                    <h3>⏳ 期限が近いタスク</h3>
-                    <div id="urgent-tasks" class="empty-state">
-                        現在、期限が近いタスクはありません。
+                <section id="pending-requests" class="dashboard-section card glass-card">
+                    <h3>⏳ 期限が近い申請</h3>
+                    <div id="pending-requests-list" class="empty-state">
+                        読み込み中...
                     </div>
                 </section>
 
-                <!-- 新着承認通知 -->
-                <section class="dashboard-section card glass-card">
-                    <h3>✅ 新着の承認通知</h3>
-                    <div id="approval-notices" class="empty-state">
-                        新着の通知はありません。
+                <!-- 承認・却下通知 -->
+                <section id="notifications" class="dashboard-section card glass-card">
+                    <h3>🔔 通知（承認・却下）</h3>
+                    <div id="notifications-list" class="empty-state">
+                        読み込み中...
                     </div>
                 </section>
             </div>

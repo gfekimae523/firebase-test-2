@@ -2,56 +2,93 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // 管理者かどうか判定する関数
-    function isAdmin() {
-      // ログイン済み かつ usersコレクションの 自分の役割が 'admin' であるか
-      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-    
-    // 自分のデータかどうか判定（ドキュメントに記録される uid フィールドと比較する場合）
-    function isOwner(uid) {
-      return request.auth != null && request.auth.uid == uid;
+    // ==========================================
+    // 補助関数
+    // ==========================================
+
+    // ログイン済みか
+    function isSignedIn() {
+      return request.auth != null;
     }
 
-    // 1. users コレクション
-    // IDが自分のUIDと一致する場合は作成・読み書き可能。管理者はすべてのユーザー情報を読み書き可能。
-    match /users/{userId} {
-      allow read, update: if request.auth != null && request.auth.uid == userId || isAdmin();
-      allow create: if request.auth != null && request.auth.uid == userId;
+    // 管理者かどうか判定
+    function isAdmin() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // 自分のデータかどうか（保存されているuidと一致するか）
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ==========================================
+    // コレクション別ルール
+    // ==========================================
+
+    // 1. ユーザー情報 (users)
+    match /users/{uid} {
+      // 自分の情報の取得・更新。管理者は全ユーザー読み書き可能。
+      allow read, update: if isOwner(uid) || isAdmin();
+      // 新規登録時のみ誰でも（ログイン済みなら）作成可能
+      allow create: if isOwner(uid);
       allow delete: if isAdmin();
     }
 
-    // 2. タイムシート申請 (timesheetRequests)
-    match /timesheetRequests/{docId} {
-      // 自分の申請だけ読み込みと作成ができる。管理者は全て読み書き可能
-      allow read: if isOwner(resource.data.uid) || isAdmin();
-      allow create: if isOwner(request.resource.data.uid);
-      allow update, delete: if isAdmin();
+    // 2. お知らせ (announcements)
+    match /announcements/{docId} {
+      // 全員読み込み可能。管理者は投稿・編集・削除可能。
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
     }
 
-    // 3. 通所予定変更申請 (attendanceChangeRequests)
+    // 3. タイムシート申請 (timesheetRequests)
+    match /timesheetRequests/{docId} {
+      // 自分の申請のみ。管理者は全て。
+      allow read: if isOwner(resource.data.uid) || isAdmin();
+      // 作成時に自分のUIDを指定しているかチェック。
+      allow create: if isOwner(request.resource.data.uid);
+      // 利用者による「取り下げ(cancelled)」更新を許可。それ以外は管理人のみ。
+      allow update: if isOwner(resource.data.uid) && request.resource.data.status == 'cancelled' || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 4. 通所予定変更申請 (attendanceChangeRequests)
     match /attendanceChangeRequests/{docId} {
       allow read: if isOwner(resource.data.uid) || isAdmin();
       allow create: if isOwner(request.resource.data.uid);
-      allow update, delete: if isAdmin();
+      allow update: if isOwner(resource.data.uid) && request.resource.data.status == 'cancelled' || isAdmin();
+      allow delete: if isAdmin();
     }
 
-    // 4. 面談申請 (interviewRequests)
+    // 5. 面談申請 (interviewRequests)
     match /interviewRequests/{docId} {
       allow read: if isOwner(resource.data.uid) || isAdmin();
       allow create: if isOwner(request.resource.data.uid);
-      allow update, delete: if isAdmin();
+      allow update: if isOwner(resource.data.uid) && request.resource.data.status == 'cancelled' || isAdmin();
+      allow delete: if isAdmin();
     }
 
-    // 5. 確定した面談 (interviews)
-    // （スタッフ管理者が予定を設定するため、一般利用者は読み込みのみ）
+    // 6. 確定したタイムシート (timesheets)
+    // タイムシートに関連する詳細データ(attendances)も含む
+    match /timesheets/{tsId} {
+      allow read: if isOwner(resource.data.uid) || isAdmin();
+      allow write: if isAdmin();
+
+      // サブコレクション（各日付の勤怠レコード）
+      match /attendances/{dateId} {
+        allow read: if isOwner(get(/databases/$(database)/documents/timesheets/$(tsId)).data.uid) || isAdmin();
+        allow write: if isAdmin();
+      }
+    }
+
+    // 7. 確定した面談 (interviews)
     match /interviews/{docId} {
       allow read: if isOwner(resource.data.uid) || isAdmin();
       allow write: if isAdmin();
     }
     
-    // 6. 確定したタイムシート (timesheets)
-    match /timesheets/{docId} {
+    // 8. 通知 (notifications) - 基本読み取り専用（作成はシステム/管理者が行う想定）
+    match /notifications/{docId} {
       allow read: if isOwner(resource.data.uid) || isAdmin();
       allow write: if isAdmin();
     }

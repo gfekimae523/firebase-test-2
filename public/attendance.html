@@ -3,128 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>通所・タイムシート - 就労移行支援ポータル</title>
+    <title>通所予定 - 就労移行支援ポータル</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dashboard-body">
     <!-- サイドバー -->
-    <aside class="sidebar">
+    <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
             <div class="logo">🌟 Portal</div>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item">ダッシュボード</a>
-            <a href="attendance.html" class="nav-item active">通所・タイムシート</a>
-            <a href="interview.html" class="nav-item">面談</a>
+            <a href="attendance.html" id="nav-attendance" class="nav-item active">通所・タイムシート</a>
+            <a href="interview.html" id="nav-interview" class="nav-item">面談</a>
         </nav>
     </aside>
 
     <!-- メインコンテンツ -->
     <main class="main-content">
+        <!-- ヘッダー -->
         <header class="top-header">
-            <h2 class="page-title">通所・タイムシート</h2>
+            <h2 class="page-title">通所予定</h2>
             <div class="user-profile">
-                <span id="user-name" class="user-name">読み込み中...</span>
+                <span id="username" class="user-name">読み込み中...</span>
                 <button id="logout-btn" class="btn btn-outline btn-sm">ログアウト</button>
             </div>
         </header>
 
+        <!-- コンテンツエリア -->
         <div class="content-wrapper">
-            <div class="header-actions" style="display: flex; justify-content: flex-end; margin-bottom: 24px;">
-                <button id="open-timesheet-modal" class="btn btn-primary" style="background-color: var(--primary-color); color: white;">+ タイムシート作成</button>
-            </div>
+            <!-- カレンダーセクション -->
+            <section id="calendar-section" class="dashboard-section card glass-card">
+                <div id="calendar-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <button id="prev-month-btn" class="btn btn-outline btn-sm">&lt;</button>
+                    <span id="current-month" style="font-weight: 600; font-size: 1.2rem;">2026年4月</span>
+                    <button id="next-month-btn" class="btn btn-outline btn-sm">&gt;</button>
+                </div>
+                <div id="calendar-grid" class="calendar-grid">
+                    <!-- JSでカレンダーを描画 -->
+                </div>
+            </section>
 
-            <div class="dashboard-grid">
-                <!-- カレンダー表示エリア -->
-                <section class="dashboard-section card glass-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3>📅 月間カレンダー</h3>
-                        <div class="calendar-controls">
-                            <button id="prev-month" class="btn btn-outline btn-sm">&lt;</button>
-                            <span id="current-month-display" style="font-weight: 600; margin: 0 16px;">2026年4月</span>
-                            <button id="next-month" class="btn btn-outline btn-sm">&gt;</button>
-                        </div>
-                    </div>
-                    <!-- カレンダー本体実装部分 -->
-                    <div id="calendar-grid" class="calendar-grid">
-                        <p class="empty-state">カレンダーデータを読み込み中...</p>
-                    </div>
-                </section>
+            <!-- アクションセクション -->
+            <section id="attendance-actions" style="margin-bottom: 24px;">
+                <button id="btn-create-timesheet" class="btn btn-primary">タイムシート作成</button>
+            </section>
 
-                <!-- 申請一覧エリア -->
-                <section class="dashboard-section card glass-card">
-                    <h3>📋 申請状況の確認</h3>
-                    
-                    <div class="tab-list" style="margin-bottom: 16px; border-bottom: 1px solid #e5e7eb;">
-                        <h4>承認待ち: タイムシート</h4>
-                        <ul id="pending-timesheets" class="notification-list"></ul>
-                    </div>
-                    
-                    <div class="tab-list">
-                        <h4>通所予定変更申請</h4>
-                        <button id="open-change-modal" class="btn btn-outline btn-sm" style="margin-bottom: 12px;">+ 変更申請</button>
-                        <ul id="change-requests" class="notification-list"></ul>
-                    </div>
-                </section>
-            </div>
+            <!-- 申請一覧セクション -->
+            <section id="request-list" class="dashboard-section card glass-card">
+                <h3>📋 タイムシート申請状況</h3>
+                <ul id="timesheet-request-list" class="notification-list">
+                    <!-- JSで動的に表示 -->
+                </ul>
+
+                <h3 style="margin-top: 24px;">📋 通所変更申請状況</h3>
+                <ul id="attendance-change-request-list" class="notification-list">
+                    <!-- JSで動的に表示 -->
+                </ul>
+            </section>
         </div>
     </main>
 
-    <!-- モーダル: タイムシート作成 -->
-    <div id="timesheet-modal" class="modal-overlay hidden">
+    <!-- モーダル① 通所予定変更申請 -->
+    <div id="attendance-change-modal" class="modal-overlay hidden">
         <div class="modal-card">
-            <h3>タイムシートの作成・申請</h3>
+            <h3>通所予定変更申請</h3>
             <div class="modal-body">
-                <p style="margin-bottom: 12px; color: var(--text-muted); font-size: 14px;">月単位の通所予定を入力してください。</p>
-                
-                <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-end;">
-                    <div style="flex:1;">
-                        <label>対象月</label>
-                        <input type="month" id="timesheet-month" class="form-control">
+                <p>変更前日付: <span id="original-date">-</span></p>
+                <div class="form-group">
+                    <label for="request-type">申請種別</label>
+                    <select id="request-type" class="form-control">
+                        <option value="create">新規（通所追加）</option>
+                        <option value="update">更新（時間変更）</option>
+                        <option value="cancel">欠席（通所削除）</option>
+                    </select>
+                </div>
+                <div id="change-inputs">
+                    <div class="form-group">
+                        <label for="new-date">変更後日付</label>
+                        <input type="date" id="new-date" class="form-control">
                     </div>
-                    <button id="fill-weekdays-btn" class="btn btn-outline btn-sm" style="margin-left: 12px; height: 40px;">平日を一括選択</button>
+                    <div class="form-group">
+                        <label for="new-start-time">開始時刻</label>
+                        <input type="time" id="new-start-time" class="form-control" value="10:00">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-end-time">終了時刻</label>
+                        <input type="time" id="new-end-time" class="form-control" value="15:00">
+                    </div>
                 </div>
-
-                <!-- インタラクティブカレンダーGUI -->
-                <div id="modal-calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 16px;">
-                     <p class="empty-state" style="grid-column: span 7;">対象月を選択してください。</p>
+                <div class="form-group">
+                    <label for="change-reason">申請理由 (必須)</label>
+                    <textarea id="change-reason" class="form-control" rows="3"></textarea>
                 </div>
-                
-                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">※選択された日は 10:00 〜 15:00 で申請されます。日付をクリックして切り替えてください。</div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-outline close-modal" data-target="timesheet-modal">キャンセル</button>
-                <button id="submit-timesheet" class="btn btn-primary" style="background-color: var(--primary-color); color: white;">申請する</button>
+                <button id="cancel-change-request" class="btn btn-outline">キャンセル</button>
+                <button id="submit-change-request" class="btn btn-primary">申請送信</button>
             </div>
         </div>
     </div>
 
-    <!-- モーダル: 通所変更申請 -->
-    <div id="change-modal" class="modal-overlay hidden">
+    <!-- モーダル② タイムシート作成 -->
+    <div id="timesheet-modal" class="modal-overlay hidden">
         <div class="modal-card">
-            <h3>通所予定の変更申請</h3>
+            <h3>タイムシート作成</h3>
             <div class="modal-body">
-                <div style="margin-bottom: 16px;">
-                    <label>対象日</label>
-                    <input type="date" id="change-date" class="form-control">
+                <div class="form-group">
+                    <label for="target-month">対象月</label>
+                    <input type="month" id="target-month" class="form-control">
                 </div>
-                <div style="margin-bottom: 16px;">
-                    <label>申請種別</label>
-                    <select id="change-type" class="form-control">
-                        <option value="create">新規追加</option>
-                        <option value="update">時間変更</option>
-                        <option value="cancel">欠席（削除）</option>
-                    </select>
+                <div id="timesheet-calendar" class="calendar-grid-small" style="margin-bottom: 16px;">
+                    <!-- 対象月のカレンダーGUI -->
                 </div>
-                <div style="margin-bottom: 16px;">
-                    <label>理由</label>
-                    <textarea id="change-reason" class="form-control" rows="3" placeholder="変更の理由を入力してください"></textarea>
+                <div class="form-actions-inline" style="margin-bottom: 16px;">
+                    <button id="fill-weekdays-btn" class="btn btn-outline btn-sm">平日一括入力</button>
+                </div>
+                <div class="form-group">
+                    <label for="default-start-time">デフォルト開始時刻</label>
+                    <input type="time" id="default-start-time" class="form-control" value="10:00">
+                </div>
+                <div class="form-group">
+                    <label for="default-end-time">デフォルト終了時刻</label>
+                    <input type="time" id="default-end-time" class="form-control" value="15:00">
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-outline close-modal" data-target="change-modal">キャンセル</button>
-                <button id="submit-change" class="btn btn-primary" style="background-color: var(--primary-color); color: white;">申請する</button>
+                <button id="cancel-timesheet" class="btn btn-outline">キャンセル</button>
+                <button id="submit-timesheet" class="btn btn-primary">申請送信</button>
             </div>
         </div>
     </div>
