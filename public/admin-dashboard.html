@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者ダッシュボード - 就労移行支援ポータル</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-body">
+    <!-- 管理者用サイドバー（少し色を変えるなどして区別してもOK） -->
+    <aside class="sidebar">
+        <div class="sidebar-header" style="background-color: #1F2937;">
+            <div class="logo" style="color: white;">🌟 Admin Portal</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html" class="nav-item active">ダッシュボード</a>
+            <a href="admin-users.html" class="nav-item">ユーザー管理</a>
+            <a href="admin-attendance.html" class="nav-item">通所予定管理</a>
+            <a href="admin-interview.html" class="nav-item">面談管理</a>
+        </nav>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+        <header class="top-header" style="border-bottom-color: var(--primary-color);">
+            <h2 class="page-title">管理者ダッシュボード</h2>
+            <div class="user-profile">
+                <span id="user-name" class="user-name">管理者 読み込み中...</span>
+                <button id="logout-btn" class="btn btn-outline btn-sm">ログアウト</button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <section class="dashboard-section card glass-card" style="border-top: 4px solid var(--primary-color);">
+                <h3>🚨 未確認の申請・タスク</h3>
+                <div class="dashboard-grid" style="margin-top: 24px;">
+                    <!-- タイムシート承認待ち -->
+                    <div style="background: #F9FAFB; padding: 16px; border-radius: 8px;">
+                        <h4 style="font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">タイムシート承認待ち</h4>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--primary-color);">3 <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">件</span></div>
+                    </div>
+                    <!-- 通所予定変更申請 -->
+                    <div style="background: #F9FAFB; padding: 16px; border-radius: 8px;">
+                        <h4 style="font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">通所予定変更申請</h4>
+                        <div style="font-size: 28px; font-weight: 700; color: #EF4444;">1 <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">件</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section card glass-card">
+                <h3>📝 最新のアクティビティ</h3>
+                <ul class="notification-list">
+                    <li><span class="date">10分前</span> Aさんがタイムシート（4月分）を申請しました。</li>
+                    <li><span class="date">1時間前</span> Bさんが明日の通所時間変更を申請しました。</li>
+                    <li><span class="date">昨日</span> Cさんが新規ユーザー登録を行いました。</li>
+                </ul>
+            </section>
+        </div>
+    </main>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/admin-dashboard.js"></script>
+</body>
+</html>

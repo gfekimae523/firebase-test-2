@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>就労移行支援ポータル - ログイン</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <div class="glass-card login-card">
+            <div class="login-header">
+                <div class="logo-placeholder">🌟</div>
+                <h1>就労移行支援ポータル</h1>
+                <p>あなたの未来をサポートします</p>
+            </div>
+            
+            <button id="google-login-btn" class="btn google-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo">
+                <span>Googleでログイン</span>
+            </button>
+            <div id="login-error" class="error-text hidden"></div>
+        </div>
+    </div>
+    
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+</body>
+</html>

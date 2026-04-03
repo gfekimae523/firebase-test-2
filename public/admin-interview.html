@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面談管理 - 就労移行支援ポータル</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .data-table th, .data-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #E5E7EB; }
+    </style>
+</head>
+<body class="dashboard-body">
+    <!-- サイドバー -->
+    <aside class="sidebar">
+        <div class="sidebar-header" style="background-color: #1F2937;">
+            <div class="logo" style="color: white;">🌟 Admin Portal</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admin-dashboard.html" class="nav-item">ダッシュボード</a>
+            <a href="admin-users.html" class="nav-item">ユーザー管理</a>
+            <a href="admin-attendance.html" class="nav-item">通所予定管理</a>
+            <a href="admin-interview.html" class="nav-item active">面談管理</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header" style="border-bottom-color: var(--primary-color);">
+            <h2 class="page-title">面談管理</h2>
+            <div class="user-profile">
+                <span id="user-name" class="user-name">管理者 読み込み中...</span>
+                <button id="logout-btn" class="btn btn-outline btn-sm">ログアウト</button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <div class="dashboard-grid">
+                
+                <section class="dashboard-section card glass-card">
+                    <h3>💬 面談一覧（確定済み）</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>利用者名</th>
+                                <th>日時</th>
+                                <th>担当スタッフ</th>
+                                <th>内容</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-weight: 500;">山田 太郎</td>
+                                <td>4/10 13:00</td>
+                                <td>鈴木スタッフ</td>
+                                <td><span style="color: var(--text-muted); font-size: 13px;">応募書類の書き方</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section class="dashboard-section card glass-card">
+                    <h3>⏳ 未確定の面談申請</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>申請者</th>
+                                <th>希望週/日時</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Cさん</td>
+                                <td>4月第3週</td>
+                                <td><button class="btn btn-primary btn-sm" style="background: var(--primary-color); color: white;" onclick="alert('調整モーダルを開きます（モック）')">調整</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/admin-dashboard.js"></script> <!-- 同じ権限チェックの流用 -->
+</body>
+</html>

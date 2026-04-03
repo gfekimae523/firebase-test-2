@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>利用者ダッシュボード - 就労移行支援ポータル</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-body">
+    <!-- サイドバー -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">🌟 Portal</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">ダッシュボード</a>
+            <a href="attendance.html" class="nav-item">通所・タイムシート</a>
+            <a href="interview.html" class="nav-item">面談</a>
+        </nav>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+        <!-- ヘッダー -->
+        <header class="top-header">
+            <h2 class="page-title">ダッシュボード</h2>
+            <div class="user-profile">
+                <span id="user-name" class="user-name">読み込み中...</span>
+                <button id="logout-btn" class="btn btn-outline btn-sm">ログアウト</button>
+            </div>
+        </header>
+
+        <!-- コンテンツエリア -->
+        <div class="content-wrapper">
+            <!-- 全体お知らせ -->
+            <section class="dashboard-section card glass-card">
+                <h3>📢 全体お知らせ</h3>
+                <ul class="notification-list" id="global-notices">
+                    <li><span class="date">2026/04/01</span> 新しいポータルサイトがオープンしました！</li>
+                    <li><span class="date">2026/04/03</span> 今月のタイムシート入力は5日までにお願いします。</li>
+                </ul>
+            </section>
+
+            <div class="dashboard-grid">
+                <!-- 回答期限の近い申請 -->
+                <section class="dashboard-section card glass-card">
+                    <h3>⏳ 期限が近いタスク</h3>
+                    <div id="urgent-tasks" class="empty-state">
+                        現在、期限が近いタスクはありません。
+                    </div>
+                </section>
+
+                <!-- 新着承認通知 -->
+                <section class="dashboard-section card glass-card">
+                    <h3>✅ 新着の承認通知</h3>
+                    <div id="approval-notices" class="empty-state">
+                        新着の通知はありません。
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

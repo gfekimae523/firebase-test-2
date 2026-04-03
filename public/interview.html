@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面談 - 就労移行支援ポータル</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-body">
+    <!-- サイドバー -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">🌟 Portal</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">ダッシュボード</a>
+            <a href="attendance.html" class="nav-item">通所・タイムシート</a>
+            <a href="interview.html" class="nav-item active">面談</a>
+        </nav>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+        <header class="top-header">
+            <h2 class="page-title">面談</h2>
+            <div class="user-profile">
+                <span id="user-name" class="user-name">読み込み中...</span>
+                <button id="logout-btn" class="btn btn-outline btn-sm">ログアウト</button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <div class="header-actions" style="display: flex; justify-content: flex-end; margin-bottom: 24px;">
+                <button id="open-interview-modal" class="btn btn-primary" style="background-color: var(--primary-color); color: white;">+ 面談を申請する</button>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- 確定済みの面談 -->
+                <section class="dashboard-section card glass-card">
+                    <h3>💬 確定した面談予定</h3>
+                    <ul id="scheduled-interviews" class="notification-list">
+                        <li>
+                            <div style="font-weight: 500; color: var(--primary-color);">4月10日(水) 13:00 - 14:00</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">担当: 山田スタッフ / 相談内容: 応募書類の書き方について</div>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- 申請中の面談 -->
+                <section class="dashboard-section card glass-card">
+                    <h3>⏳ 申請中の面談</h3>
+                    <ul id="pending-interviews" class="notification-list">
+                        <li>
+                            <div style="font-weight: 500;">第3週（4月15日〜）希望</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">現在管理者による調整中です。</div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- モーダル: 面談申請 -->
+    <div id="interview-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>面談の申請</h3>
+            <div class="modal-body">
+                <div style="margin-bottom: 16px;">
+                    <label>対象週の開始日（月曜日）</label>
+                    <input type="date" id="interview-week" class="form-control">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label>面談希望日時（複数可）</label>
+                    <textarea id="interview-dates" class="form-control" rows="3" placeholder="例: 月曜の午後、水曜の午前中いつでも可"></textarea>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label>相談したい内容</label>
+                    <textarea id="interview-content" class="form-control" rows="3" placeholder="相談内容を入力してください"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline close-modal" data-target="interview-modal">キャンセル</button>
+                <button id="submit-interview" class="btn btn-primary" style="background-color: var(--primary-color); color: white;">申請送信</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/interview.js"></script>
+</body>
+</html>
