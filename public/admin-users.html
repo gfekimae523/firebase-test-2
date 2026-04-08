@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー管理 - 就労移行支援ポータル(管理)</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <script type="module" src="js/admin-users.js"></script>
+</head>
+<body>
+    <header>
+        <!-- 管理者共通ヘッダー -->
+    </header>
+
+    <div class="layout-wrapper">
+        <aside id="sidebar">
+            <!-- 管理者共通サイドバー -->
+        </aside>
+
+        <main>
+            <h2>ユーザー管理</h2>
+            
+            <div id="filter-area">
+                <input type="text" id="search-user" placeholder="名前・メールアドレスで検索">
+                <select id="role-filter">
+                    <option value="">全ロール</option>
+                    <option value="user">利用者 (user)</option>
+                    <option value="admin">管理者 (admin)</option>
+                </select>
+                <select id="status-filter">
+                    <option value="">全ステータス</option>
+                    <option value="active">有効 (active)</option>
+                    <option value="inactive">無効 (inactive)</option>
+                </select>
+            </div>
+
+            <table id="users-table">
+                <thead>
+                    <tr>
+                        <th>名前</th>
+                        <th>メールアドレス</th>
+                        <th>ロール</th>
+                        <th>ステータス</th>
+                        <th>登録日</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- ユーザー一覧が動的に挿入されます -->
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <!-- モーダル: ユーザー編集 -->
+    <div id="user-edit-modal" class="modal-overlay" hidden>
+        <div class="modal-content" style="max-width: 400px;">
+            <h3>ユーザー情報編集</h3>
+            <div class="modal-row">
+                <label>ユーザー名:</label>
+                <input type="text" id="edit-username-input">
+            </div>
+            
+            <div class="modal-row">
+                <label>ロール選択:</label>
+                <select id="edit-role">
+                    <option value="user">利用者 (user)</option>
+                    <option value="admin">管理者 (admin)</option>
+                </select>
+            </div>
+            
+            <div class="modal-row">
+                <label>ステータス:</label>
+                <select id="edit-status">
+                    <option value="active">有効 (active)</option>
+                    <option value="inactive">無効/退所 (inactive)</option>
+                </select>
+            </div>
+            
+            <div class="modal-actions">
+                <button id="cancel-edit-btn" class="btn-secondary">キャンセル</button>
+                <button id="save-user-btn" class="btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全ページ共通要素 -->
+    <div id="loading-spinner" hidden></div>
+    <div id="toast-container"></div>
+    <div id="confirm-dialog" hidden></div>
+</body>
+</html>

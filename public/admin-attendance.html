@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通所予定管理 - 就労移行支援ポータル(管理)</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/calendar.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <script type="module" src="js/admin-attendance.js"></script>
+</head>
+
+<body>
+    <header>
+        <!-- 管理者共通ヘッダー -->
+    </header>
+
+    <div class="layout-wrapper">
+        <aside id="sidebar">
+            <!-- 管理者共通サイドバー -->
+        </aside>
+
+        <main>
+            <h2>通所予定管理</h2>
+
+            <div id="user-selector">
+                <select id="user-select">
+                    <option value="">利用者を選択してください</option>
+                </select>
+                <button id="print-timesheet">タイムシート印刷(PDF)</button>
+            </div>
+
+            <div id="calendar">
+                <div id="calendar-header">
+                    <button id="prev-month">前月</button>
+                    <span id="current-month"></span>
+                    <button id="next-month">次月</button>
+                </div>
+                <div id="calendar-grid"></div>
+            </div>
+
+            <section id="timesheet-requests">
+                <h3>未確認タイムシート申請</h3>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>対象月</th>
+                                <th>利用者名</th>
+                                <th>申請日時</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timesheet-request-list"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="attendance-change-requests">
+                <h3>未確認通所予定変更申請</h3>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>対象日</th>
+                                <th>利用者名</th>
+                                <th>種別</th>
+                                <th>変更後</th>
+                                <th>理由</th>
+                                <th>申請日時</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-change-request-list"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- モーダル: タイムシート申請確認 -->
+    <div id="timesheet-confirm-modal" class="modal-overlay" hidden>
+        <div class="modal-content" style="max-width: 700px;">
+            <h3>タイムシート申請確認</h3>
+            <div id="ts-request-info" style="margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;"></div>
+            <div id="ts-attendance-list" style="max-height: 300px; overflow-y: auto; background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 0.5rem;"></div>
+            
+            <div class="modal-row" style="flex-direction: column; align-items: stretch; gap: 0.5rem; margin-top: 1rem;">
+                <label>管理者コメント (却下時のみ必須):</label>
+                <textarea id="ts-admin-comment" rows="2" placeholder="却下理由を入力してください"></textarea>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" onclick="hideModal('timesheet-confirm-modal')" class="btn-secondary">とじる</button>
+                <div style="flex: 1;"></div>
+                <button id="ts-reject-btn" class="btn-secondary" style="background: #e74c3c; color: white;">却下</button>
+                <button id="ts-approve-btn" class="btn-primary">承認</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- モーダル: 通所予定変更申請確認 -->
+    <div id="change-confirm-modal" class="modal-overlay" hidden>
+        <div class="modal-content">
+            <h3>通所予定変更申請確認</h3>
+            <div id="change-request-detail" style="background: #eef7ff; padding: 1rem; border-radius: 8px; margin: 0.5rem 0; line-height: 1.8;"></div>
+            
+            <div class="modal-row" style="flex-direction: column; align-items: stretch; gap: 0.5rem; margin-top: 1rem;">
+                <label>管理者コメント (却下時のみ必須):</label>
+                <textarea id="change-admin-comment" rows="3" placeholder="却下理由を入力してください"></textarea>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" onclick="hideModal('change-confirm-modal')" class="btn-secondary">とじる</button>
+                <div style="flex: 1;"></div>
+                <button id="change-reject-btn" class="btn-secondary" style="background: #e74c3c; color: white;">却下</button>
+                <button id="change-approve-btn" class="btn-primary">承認</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全ページ共通要素 -->
+    <div id="loading-spinner" hidden></div>
+    <div id="toast-container"></div>
+    <div id="confirm-dialog" hidden></div>
+</body>
+
+</html>

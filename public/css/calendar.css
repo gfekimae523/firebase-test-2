@@ -1,0 +1,82 @@
+.calendar-grid {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.calendar-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-cell {
+    min-height: 80px;
+    padding: 8px;
+    border: 0.5px solid #eee;
+    position: relative;
+    cursor: pointer;
+}
+
+.calendar-cell:hover {
+    background-color: #f1f8ff;
+}
+
+.header-cell {
+    background-color: #f8f9fa;
+    min-height: auto;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px 0;
+    cursor: default;
+}
+
+.header-cell:hover { background: #f8f9fa; }
+
+.attendance-event {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    font-size: 0.75rem;
+    padding: 4px;
+    border-radius: 4px;
+    margin-top: 4px;
+    border-left: 3px solid #1976d2;
+}
+
+.has-attendance {
+    background-color: #f7fbff;
+}
+
+.weekend { color: #e74c3c; }
+.weekday { color: #333; }
+
+.not-clickable {
+    cursor: default !important;
+}
+
+.not-clickable:hover {
+    background-color: white !important;
+}
+
+/* Modal calendar specific */
+#timesheet-calendar {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+#timesheet-calendar div {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    text-align: center;
+}
+
+#timesheet-calendar label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+}

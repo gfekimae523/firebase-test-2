@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通所予定 - 就労移行支援ポータル</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/calendar.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <script type="module" src="js/attendance.js"></script>
+</head>
+
+<body>
+    <header>
+        <!-- 共通のヘッダー -->
+    </header>
+
+    <div class="layout-wrapper">
+        <aside id="sidebar">
+            <!-- 共通のサイドバー -->
+        </aside>
+
+        <main>
+            <section id="calendar-section">
+                <div id="calendar-header"
+                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <button id="prev-month-btn">前月</button>
+                        <span id="current-month"
+                            style="font-size: 1.25rem; font-weight: bold; min-width: 120px; text-align: center;"></span>
+                        <button id="next-month-btn">次月</button>
+                    </div>
+                    <button id="btn-create-timesheet" class="btn-primary">タイムシート作成</button>
+                </div>
+                <div id="calendar-grid"></div>
+            </section>
+
+            <section id="request-list">
+                <h3>タイムシート申請履歴</h3>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>対象月</th>
+                                <th>ステータス</th>
+                                <th>申請日時</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timesheet-request-list"></tbody>
+                    </table>
+                </div>
+
+                <h3 style="margin-top: 2rem;">通所変更申請履歴</h3>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>対象日</th>
+                                <th>種別</th>
+                                <th>変更後</th>
+                                <th>ステータス</th>
+                                <th>申請日時</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-change-request-list"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- モーダル1: 通所予定変更申請 -->
+    <div id="attendance-change-modal" class="modal-overlay" hidden>
+        <div class="modal-content">
+            <h3>予定変更申請</h3>
+            <div class="modal-row">
+                <label>申請種別:</label>
+                <select id="request-type">
+                    <option value="create">新規</option>
+                    <option value="cancel">削除</option>
+                    <option value="update">日時変更</option>
+                </select>
+            </div>
+            <div id="original-date"
+                style="padding: 0.5rem; background: #f0f0f0; border-radius: 4px; font-size: 0.9rem;">対象日: 未選択</div>
+            <div class="modal-row">
+                <label>日付:</label>
+                <input type="date" id="new-date">
+            </div>
+            <div class="modal-row">
+                <label>時間:</label>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1;">
+                    <input type="time" id="new-start-time"> 〜 <input type="time" id="new-end-time">
+                </div>
+            </div>
+            <div class="modal-row">
+                <label>申請理由:</label>
+                <textarea id="change-reason" rows="3" placeholder="理由を入力してください"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-change-request" class="btn-secondary">キャンセル</button>
+                <button id="submit-change-request" class="btn-primary">申請送信</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- モーダル2: タイムシート作成・再申請 -->
+    <div id="timesheet-modal" class="modal-overlay" hidden>
+        <div class="modal-content" style="max-width: 600px;">
+            <h3>タイムシート作成</h3>
+            <div class="modal-row">
+                <label>対象月:</label>
+                <input type="month" id="target-month">
+            </div>
+            <div class="modal-actions" style="justify-content: flex-start; margin: 0.5rem 0;">
+                <button id="fill-weekdays-btn" style="background: #27ae60; color: white;">平日一括選択</button>
+            </div>
+            <div id="timesheet-calendar"></div>
+            <div class="modal-actions">
+                <button id="cancel-timesheet" class="btn-secondary">キャンセル</button>
+                <button id="submit-timesheet" class="btn-primary">申請送信</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全ページ共通要素 -->
+    <div id="loading-spinner" hidden></div>
+    <div id="toast-container"></div>
+    <div id="confirm-dialog" hidden></div>
+</body>
+
+</html>

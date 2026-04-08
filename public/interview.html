@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面談 - 就労移行支援ポータル</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <script type="module" src="js/interview.js"></script>
+</head>
+<body>
+    <header>
+        <!-- 共通のヘッダー -->
+    </header>
+
+    <div class="layout-wrapper">
+        <aside id="sidebar">
+            <!-- 共通のサイドバー -->
+        </aside>
+
+        <main>
+            <section id="interview-schedule">
+                <h3>確定した面談予定</h3>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>日時</th>
+                                <th>担当スタッフ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="confirmed-interviews"></tbody>
+                    </table>
+                </div>
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 2rem; margin-bottom: 1rem;">
+                    <h3 style="margin-bottom: 0;">申請中の面談</h3>
+                    <button id="create-interview-request" class="btn-primary">面談申請作成</button>
+                </div>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>対象週</th>
+                                <th>ステータス</th>
+                                <th>申請日時</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-interviews"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- モーダル: 面談申請作成 -->
+    <div id="interview-request-modal" class="modal-overlay" hidden>
+        <div class="modal-content">
+            <h3>面談申請作成</h3>
+            <div class="modal-row">
+                <label>対象週 (月曜日の日付):</label>
+                <input type="date" id="target-week">
+            </div>
+            
+            <p style="font-size: 0.85rem; margin-top: 1rem; color: #666; font-weight: bold;">希望する面談日を選択してください (2週間分・複数可):</p>
+            <div id="available-date-picker" style="background: #fafafa; border: 1px solid #eee; padding: 10px; border-radius: 8px;"></div>
+            
+            <div class="modal-row" style="flex-direction: column; align-items: stretch; gap: 0.5rem; margin-top: 1rem;">
+                <label>相談したい内容:</label>
+                <textarea id="interview-content" rows="3" placeholder="相談の概要や特に話したいことがあれば入力してください"></textarea>
+            </div>
+            
+            <div class="modal-actions">
+                <button id="cancel-interview-request" class="btn-secondary">キャンセル</button>
+                <button id="submit-interview-request" class="btn-primary">申請を送信する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全ページ共通要素 -->
+    <div id="loading-spinner" hidden></div>
+    <div id="toast-container"></div>
+    <div id="confirm-dialog" hidden></div>
+</body>
+</html>

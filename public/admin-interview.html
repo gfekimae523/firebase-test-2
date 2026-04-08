@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面談管理 - 就労移行支援ポータル(管理)</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <script type="module" src="js/admin-interview.js"></script>
+</head>
+<body>
+    <header>
+        <!-- 管理者共通ヘッダー -->
+    </header>
+
+    <div class="layout-wrapper">
+        <aside id="sidebar">
+            <!-- 管理者共通サイドバー -->
+        </aside>
+
+        <main>
+            <h2>面談管理</h2>
+
+            <section id="interview-requests">
+                <h3>未確認の面談申請</h3>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>対象週</th>
+                                <th>利用者名</th>
+                                <th>申請日時</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-interview-requests"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="confirmed-interviews">
+                <h3>確定済み面談</h3>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>日時</th>
+                                <th>利用者名</th>
+                                <th>担当スタッフ</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="confirmed-interview-list"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- モーダル: 申請確認・面談確定 -->
+    <div id="interview-confirm-modal" hidden>
+        <h3>面談申請確認</h3>
+        <div id="interview-request-info"></div>
+        
+        <input type="date" id="interview-date">
+        <input type="time" id="interview-start-time">
+        <input type="time" id="interview-end-time">
+        <select id="staff-select">
+            <option value="">担当スタッフを選択</option>
+        </select>
+        
+        <textarea id="reject-comment" placeholder="却下する場合はコメントを入力"></textarea>
+        
+        <button id="create-interview">面談確定</button>
+        <button id="reject-interview">申請却下</button>
+    </div>
+
+    <!-- モーダル: 確定面談の詳細・キャンセル -->
+    <div id="interview-detail-modal" hidden>
+        <h3>面談詳細</h3>
+        <div id="interview-info"></div>
+        <button id="cancel-interview">面談キャンセル</button>
+    </div>
+
+    <!-- 全ページ共通要素 -->
+    <div id="loading-spinner" hidden></div>
+    <div id="toast-container"></div>
+    <div id="confirm-dialog" hidden></div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者ダッシュボード - 就労移行支援ポータル</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <script type="module" src="js/admin-dashboard.js"></script>
+</head>
+<body>
+    <header>
+        <!-- 管理者共通ヘッダー -->
+    </header>
+
+    <div class="layout-wrapper">
+        <aside id="sidebar">
+            <!-- 管理者共通サイドバー -->
+        </aside>
+
+        <main>
+            <section id="admin-announcements">
+                <h2>お知らせ管理</h2>
+                <button id="create-announcement-btn">お知らせ新規投稿</button>
+                <ul id="announcement-list"></ul>
+            </section>
+
+            <section id="pending-requests">
+                <h2>未確認申請</h2>
+                <ul id="pending-request-list"></ul>
+            </section>
+        </main>
+    </div>
+
+    <!-- モーダル: お知らせ投稿・編集 -->
+    <div id="announcement-modal" hidden>
+        <input type="text" id="announcement-title" placeholder="タイトル">
+        <textarea id="announcement-body" placeholder="本文"></textarea>
+        <button id="submit-announcement">投稿 / 更新</button>
+    </div>
+
+    <!-- 全ページ共通要素 -->
+    <div id="loading-spinner" hidden></div>
+    <div id="toast-container"></div>
+    <div id="confirm-dialog" hidden></div>
+</body>
+</html>
