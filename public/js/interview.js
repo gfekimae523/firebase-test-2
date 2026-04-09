@@ -14,21 +14,21 @@ export async function initInterviewPage() {
         showLoading();
         currentUserData = await checkAuth('user');
         setupCommonUI(currentUserData, logout);
-        
+
         // イベントリスナー設定
         document.getElementById('create-interview-request')?.addEventListener('click', openInterviewRequestModal);
         document.getElementById('submit-interview-request')?.addEventListener('click', submitInterviewRequest);
         document.getElementById('cancel-interview-request')?.addEventListener('click', () => hideModal('interview-request-modal'));
-        
+
         document.getElementById('target-week')?.addEventListener('change', (e) => {
-             renderAvailableDatePicker(e.target.value);
+            renderAvailableDatePicker(e.target.value);
         });
 
         await Promise.all([
             loadInterviews(),
             loadInterviewRequests()
         ]);
-        
+
     } catch (e) {
         console.error(e);
     } finally {
@@ -68,8 +68,8 @@ export async function loadInterviewRequests() {
             if (req.status === 'pending') {
                 actionBtn = `<button class="btn-small" onclick="window.interviewModule.cancelInterviewRequest('${req.id}')">取り下げ</button>`;
             }
-            
-            const rejectComment = req.status === 'rejected' && req.rejectionComment ? 
+
+            const rejectComment = req.status === 'rejected' && req.rejectionComment ?
                 `<div class="rejection-box"><strong>却下理由:</strong> ${req.rejectionComment}</div>` : '';
 
             html += `<tr>
@@ -83,7 +83,7 @@ export async function loadInterviewRequests() {
             </tr>`;
         });
         listEl.innerHTML = html || '<tr><td colspan="3" class="empty-state">申請履歴はありません</td></tr>';
-        
+
         window.interviewModule = { cancelInterviewRequest };
     } catch (e) {
         console.error(e);
@@ -97,10 +97,10 @@ export function openInterviewRequestModal() {
         weekInput.value = formatDate(d);
         renderAvailableDatePicker(formatDate(d));
     }
-    
+
     const contentText = document.getElementById('interview-content');
     if (contentText) contentText.value = '';
-    
+
     showModal('interview-request-modal');
 }
 
@@ -108,21 +108,21 @@ function renderAvailableDatePicker(weekStartStr) {
     const container = document.getElementById('available-date-picker');
     if (!container) return;
     container.innerHTML = '';
-    
+
     if (!weekStartStr) return;
-    
+
     const weekStart = getWeekStart(new Date(weekStartStr));
-    
+
     // 2週間分（月曜〜次週土曜）の希望入力欄を生成（日曜は除く）
-    for (let i = 0; i < 13; i++) { 
+    for (let i = 0; i < 13; i++) {
         const d = new Date(weekStart);
         d.setDate(d.getDate() + i);
         if (d.getDay() === 0) continue; // 日曜はスキップ
-        
+
         const dStr = formatDate(d);
         const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
         const dayLabel = `${dStr} (${dayNames[d.getDay()]})`;
-        
+
         const row = document.createElement('div');
         row.className = 'date-picker-row';
         row.style.display = 'flex';
@@ -131,7 +131,7 @@ function renderAvailableDatePicker(weekStartStr) {
         row.style.padding = '8px';
         row.style.borderBottom = '1px solid #eee';
         row.style.background = '#fff';
-        
+
         row.innerHTML = `
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1;">
                 <input type="checkbox" class="avail-cb" value="${dStr}" style="width: 18px; height: 18px; cursor: pointer;">
@@ -145,27 +145,32 @@ function renderAvailableDatePicker(weekStartStr) {
 export async function submitInterviewRequest() {
     const weekStartInput = document.getElementById('target-week').value;
     const content = document.getElementById('interview-content').value;
-    
-    if (!weekStartInput || !content.trim()) {
-        showToast('対象週と相談内容は必須です', 'error');
+
+    if (!weekStartInput) {
+        showToast('対象週を入力してください', 'error');
         return;
     }
-    
-    const availableDates = []; 
+
+    if (!content.trim()) {
+        showToast('相談内容を入力してください', 'error');
+        return;
+    }
+
+    const availableDates = [];
     const rows = document.querySelectorAll('.date-picker-row');
-    
+
     rows.forEach(row => {
         const cb = row.querySelector('.avail-cb');
         if (cb.checked) {
             availableDates.push(cb.value);
         }
     });
-    
+
     if (availableDates.length === 0) {
         showToast('希望日時を1つ以上選択してください', 'error');
         return;
     }
-    
+
     try {
         showLoading();
         await createInterviewRequest({
